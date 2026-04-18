@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  
+}
+
+datasource db {
+ provider = "mysql"
+}
+model Perfiles {
+  id               Int                @id @default(autoincrement())
+  strNombrePerfil  String             @db.VarChar(100)
+  bitAdministrador Boolean            @default(false)
+  
+  // Relaciones
+  usuarios         Usuarios[]
+  permisosPerfiles PermisosPerfiles[]
+}
+
+model Usuarios {
+  id               Int      @id @default(autoincrement())
+  strNombreUsuario String   @db.VarChar(100)
+  idPerfil         Int
+  strPwd           String   @db.VarChar(255)
+  idEstadoUsuario  Int      @default(1)
+  strCorreo        String   @unique @db.VarChar(150)
+  strNumeroCelular String?  @db.VarChar(20)
+
+  // Relación con Perfiles
+  perfil           Perfiles @relation(fields: [idPerfil], references: [id])
+}
+
+model Modulos {
+  id              Int                @id @default(autoincrement())
+  strNombreModulo String             @db.VarChar(100)
+  
+  // Relaciones
+  menus           Menus[]
+  permisosPerfiles PermisosPerfiles[]
+}
+
+model Menus {
+  id       Int     @id @default(autoincrement())
+  idMenu   Int?    // Para submenús si lo necesitas
+  idModulo Int
+  
+  // Relación con Modulos
+  modulo   Modulos @relation(fields: [idModulo], references: [id])
+}
+
+model PermisosPerfiles {
+  id          Int     @id @default(autoincrement())
+  idModulo    Int
+  idPerfil    Int
+  bitAgregar  Boolean @default(false)
+  bitEditar   Boolean @default(false)
+  bitConsulta Boolean @default(false)
+  bitEliminar Boolean @default(false)
+  bitDetalle  Boolean @default(false)
+
+  // Relaciones
+  modulo      Modulos  @relation(fields: [idModulo], references: [id])
+  perfil      Perfiles @relation(fields: [idPerfil], references: [id])
+}
